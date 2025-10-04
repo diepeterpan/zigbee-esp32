@@ -1,10 +1,10 @@
 // /config/zigbee2mqtt/external_converters/shs01.js
 'use strict';
 
-const fz = require('zigbee-herdsman-converters/converters/fromZigbee');
-const tz = require('zigbee-herdsman-converters/converters/toZigbee');
-const exposes = require('zigbee-herdsman-converters/lib/exposes');
-const reporting = require('zigbee-herdsman-converters/lib/reporting');
+import * as fz from 'zigbee-herdsman-converters/converters/fromZigbee';
+import * as tz from 'zigbee-herdsman-converters/converters/toZigbee';
+import * as exposes from 'zigbee-herdsman-converters/lib/exposes';
+import * as reporting from 'zigbee-herdsman-converters/lib/reporting';
 
 const e = exposes.presets;
 const ea = exposes.access;
@@ -123,7 +123,8 @@ const tzLocal = {
   },
 };
 
-module.exports = [{
+export default [{
+  serverModuleFormat: 'cjs',
   fingerprint: [{modelID: 'SHS01', manufacturerName: 'SmartHomeScene'}],
   model: 'SHS01',
   vendor: 'SmartHomeScene',
@@ -158,6 +159,7 @@ module.exports = [{
     exposes.numeric('Occupancy Detection Sensitivity', ea.ALL).withValueMin(0).withValueMax(10),
     exposes.numeric('Movement Detection Range', ea.ALL).withUnit('m').withValueMin(0.0).withValueMax(6.0).withValueStep(0.75),
     exposes.numeric('Occupancy Detection Range', ea.ALL).withUnit('m').withValueMin(0.75).withValueMax(6.0).withValueStep(0.75),
+
   ],
 
   configure: async (device, coordinatorEndpoint) => {
