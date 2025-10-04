@@ -40,7 +40,7 @@ const fzLocal = {
       if (msg.endpoint?.ID !== EP2) return {};
       const d = msg.data || {}, out = {};
       const occ = d.occupancy ?? d['0'];
-      if (occ !== undefined) out['Occupancy'] = (typeof occ === 'number') ? ((occ & 1) === 1) : !!occ;
+      if (occ !== undefined) out['occupancy'] = (typeof occ === 'number') ? ((occ & 1) === 1) : !!occ;
       const mv = d[ATTR_MOVING_TARGET] ?? d[String(ATTR_MOVING_TARGET)];
       const st = d[ATTR_STATIC_TARGET] ?? d[String(ATTR_STATIC_TARGET)];
       if (mv !== undefined) out['Moving Target'] = (mv === true || mv === 1);
@@ -152,7 +152,7 @@ export default [{
     e.light(),
     e.binary('Moving Target', ea.STATE, true, false),
     e.binary('Static Target', ea.STATE, true, false),
-    e.binary('Occupancy', ea.STATE, true, false),
+    e.occupancy(),
     exposes.numeric('Movement Clear Cooldown', ea.ALL).withUnit('s').withValueMin(0).withValueMax(300),
     exposes.numeric('Occupancy Clear Cooldown', ea.ALL).withUnit('s').withValueMin(0).withValueMax(65535),
     exposes.numeric('Movement Detection Sensitivity', ea.ALL).withValueMin(0).withValueMax(10),

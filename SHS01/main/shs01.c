@@ -833,6 +833,10 @@ void app_main(void)
                                  UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
     ESP_LOGI(SHS_TAG, "LD2410 UART driver initialized");
 
+    /* Disable BLE on LD2410 */
+    const uint8_t disable_ble[] = { (SHS_LD2410_CMD_BLE_ENABLE & 0xFF), ((SHS_LD2410_CMD_BLE_ENABLE >> 8) & 0xFF), 0x00, 0x00 };
+    shs_ld2410_write_cmd(disable_ble, sizeof(disable_ble));
+
     /* Load settings & push to LD2410 */
     shs_cfg_load_from_nvs();
     shs_ld2410_apply_global_sensitivity();
