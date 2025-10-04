@@ -40,7 +40,8 @@ Firmware works with the LD2410, LD2410B, LD2410C and can be adapted to the new L
 
 ## Hardware
 - **ESP32-C6-WROOM-1** development board  
-- **Hi-Link LD2410C** mmWave radar sensor (UART1, 256000 baud)  
+- **Hi-Link LD2410C** mmWave radar sensor (UART1, 256000 baud)
+- **DFRobot SEN0557** mmWave radar sensor (UART1, 57600 baud) - [24GHz Human Presence Sensing Module Wiki - DFRobot](https://wiki.dfrobot.com/SKU_SEN0557_24GHz_Human_Presence_Sensing_Module)
 - USB-C or regulated 5V power supply  
 
 ---
@@ -54,9 +55,13 @@ Firmware works with the LD2410, LD2410B, LD2410C and can be adapted to the new L
 ---
 
 ## Setup
-1. Install **ESP-IDF v5.1+** 
-2. Clone this repo  
-3. Build & flash:  
+1. Install **ESP-IDF v5.1+**
+   ```bash
+   cd ~/esp-idf-v5.5/
+   ./install.sh
+   . ./export.sh
+3. Clone this repo  
+4. Build & flash:  
    ```bash
    idf.py set-target esp32c6
    idf.py build
