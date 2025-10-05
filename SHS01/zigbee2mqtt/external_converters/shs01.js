@@ -43,8 +43,8 @@ const fzLocal = {
       if (occ !== undefined) out['occupancy'] = (typeof occ === 'number') ? ((occ & 1) === 1) : !!occ;
       const mv = d[ATTR_MOVING_TARGET] ?? d[String(ATTR_MOVING_TARGET)];
       const st = d[ATTR_STATIC_TARGET] ?? d[String(ATTR_STATIC_TARGET)];
-      if (mv !== undefined) out['Moving Target'] = (mv === true || mv === 1);
-      if (st !== undefined) out['Static Target'] = (st === true || st === 1);
+      if (mv !== undefined) out['moving_target'] = (mv === true || mv === 1);
+      if (st !== undefined) out['static_target'] = (st === true || st === 1);
       return out;
     },
   },
@@ -54,12 +54,12 @@ const fzLocal = {
     convert: (_model, msg) => {
       if (msg.endpoint?.ID !== EP1) return {};
       const d = msg.data || {}, out = {};
-      if (d[ATTR_MOVEMENT_COOLDOWN]   !== undefined) out['Movement Clear Cooldown']        = d[ATTR_MOVEMENT_COOLDOWN];
-      if (d[ATTR_OCC_CLEAR_COOLDOWN]  !== undefined) out['Occupancy Clear Cooldown']       = d[ATTR_OCC_CLEAR_COOLDOWN];
-      if (d[ATTR_MOVING_SENS_0_10]    !== undefined) out['Movement Detection Sensitivity'] = d[ATTR_MOVING_SENS_0_10];
-      if (d[ATTR_STATIC_SENS_0_10]    !== undefined) out['Occupancy Detection Sensitivity']= d[ATTR_STATIC_SENS_0_10];
-      if (d[ATTR_MOVING_MAX_GATE]     !== undefined) out['Movement Detection Range']       = gateToM(d[ATTR_MOVING_MAX_GATE]);
-      if (d[ATTR_STATIC_MAX_GATE]     !== undefined) out['Occupancy Detection Range']      = gateToM(d[ATTR_STATIC_MAX_GATE]);
+      if (d[ATTR_MOVEMENT_COOLDOWN]   !== undefined) out['movement_clear_cooldown']       = d[ATTR_MOVEMENT_COOLDOWN];
+      if (d[ATTR_OCC_CLEAR_COOLDOWN]  !== undefined) out['occupancy_clear_cooldown']       = d[ATTR_OCC_CLEAR_COOLDOWN];
+      if (d[ATTR_MOVING_SENS_0_10]    !== undefined) out['movement_detection_sensitivity']      = d[ATTR_MOVING_SENS_0_10];
+      if (d[ATTR_STATIC_SENS_0_10]    !== undefined) out['occupancy_detection_sensitivity']        = d[ATTR_STATIC_SENS_0_10];
+      if (d[ATTR_MOVING_MAX_GATE]     !== undefined) out['movement_detection_range']            = gateToM(d[ATTR_MOVING_MAX_GATE]);
+      if (d[ATTR_STATIC_MAX_GATE]     !== undefined) out['occupancy_detection_range']              = gateToM(d[ATTR_STATIC_MAX_GATE]);
       return out;
     },
   },
@@ -67,57 +67,57 @@ const fzLocal = {
 
 const tzLocal = {
   _ep1: (meta) => meta.device.getEndpoint(EP1),
-  'Movement Clear Cooldown': {
-    key: ['Movement Clear Cooldown'],
+  'movement_clear_cooldown': {
+    key: ['movement_clear_cooldown'],
     convertSet: async (_e, _k, v, meta) => {
       const sec = clamp(v, 0, 300);
       await tzLocal._ep1(meta).write(CL_CFG, { [ATTR_MOVEMENT_COOLDOWN]: { value: sec, type: U16 } });
-      return { state: { 'Movement Clear Cooldown': sec } };
+      return { state: { 'movement_clear_cooldown': sec } };
     },
     convertGet: async (_e, _k, meta) => tzLocal._ep1(meta).read(CL_CFG, [ATTR_MOVEMENT_COOLDOWN]),
   },
-  'Occupancy Clear Cooldown': {
-    key: ['Occupancy Clear Cooldown'],
+  'occupancy_clear_cooldown': {
+    key: ['occupancy_clear_cooldown'],
     convertSet: async (_e, _k, v, meta) => {
       const sec = clamp(v, 0, 65535);
       await tzLocal._ep1(meta).write(CL_CFG, { [ATTR_OCC_CLEAR_COOLDOWN]: { value: sec, type: U16 } });
-      return { state: { 'Occupancy Clear Cooldown': sec } };
+      return { state: { 'occupancy_clear_cooldown': sec } };
     },
     convertGet: async (_e, _k, meta) => tzLocal._ep1(meta).read(CL_CFG, [ATTR_OCC_CLEAR_COOLDOWN]),
   },
-  'Movement Detection Sensitivity': {
-    key: ['Movement Detection Sensitivity'],
+  'movement_detection_sensitivity': {
+    key: ['movement_detection_sensitivity'],
     convertSet: async (_e, _k, v, meta) => {
       const val = clamp(v, 0, 10);
       await tzLocal._ep1(meta).write(CL_CFG, { [ATTR_MOVING_SENS_0_10]: { value: val, type: U16 } });
-      return { state: { 'Movement Detection Sensitivity': val } };
+      return { state: { 'movement_detection_sensitivity': val } };
     },
     convertGet: async (_e, _k, meta) => tzLocal._ep1(meta).read(CL_CFG, [ATTR_MOVING_SENS_0_10]),
   },
-  'Occupancy Detection Sensitivity': {
-    key: ['Occupancy Detection Sensitivity'],
+  'occupancy_detection_sensitivity': {
+    key: ['occupancy_detection_sensitivity'],
     convertSet: async (_e, _k, v, meta) => {
       const val = clamp(v, 0, 10);
       await tzLocal._ep1(meta).write(CL_CFG, { [ATTR_STATIC_SENS_0_10]: { value: val, type: U16 } });
-      return { state: { 'Occupancy Detection Sensitivity': val } };
+      return { state: { 'occupancy_detection_sensitivity': val } };
     },
     convertGet: async (_e, _k, meta) => tzLocal._ep1(meta).read(CL_CFG, [ATTR_STATIC_SENS_0_10]),
   },
-  'Movement Detection Range': {
-    key: ['Movement Detection Range'],
+  'movement_detection_range': {
+    key: ['movement_detection_range'],
     convertSet: async (_e, _k, v, meta) => {
       const gate = mToGateMv(clamp(v, 0.0, 6.0));
       await tzLocal._ep1(meta).write(CL_CFG, { [ATTR_MOVING_MAX_GATE]: { value: gate, type: U16 } });
-      return { state: { 'Movement Detection Range': gateToM(gate) } };
+      return { state: { 'movement_detection_range': gateToM(gate) } };
     },
     convertGet: async (_e, _k, meta) => tzLocal._ep1(meta).read(CL_CFG, [ATTR_MOVING_MAX_GATE]),
   },
-  'Occupancy Detection Range': {
-    key: ['Occupancy Detection Range'],
+  'occupancy_detection_range': {
+    key: ['occupancy_detection_range'],
     convertSet: async (_e, _k, v, meta) => {
       const gate = mToGateSt(clamp(v, 0.75, 6.0));
       await tzLocal._ep1(meta).write(CL_CFG, { [ATTR_STATIC_MAX_GATE]: { value: gate, type: U16 } });
-      return { state: { 'Occupancy Detection Range': gateToM(gate) } };
+      return { state: { 'occupancy_detection_range': gateToM(gate) } };
     },
     convertGet: async (_e, _k, meta) => tzLocal._ep1(meta).read(CL_CFG, [ATTR_STATIC_MAX_GATE]),
   },
@@ -127,6 +127,7 @@ export default [{
   serverModuleFormat: 'cjs',
   fingerprint: [{modelID: 'SHS01', manufacturerName: 'SmartHomeScene'}],
   model: 'SHS01',
+  icon: 'http://zigbee2mqtt.ourhome.co.za:8180/device_icons/ld2410.jpg',
   vendor: 'SmartHomeScene',
   description: 'ESP32-C6 LD2410C: light + Moving/Static/Occupancy + config (EP1/EP2)',
   meta: {configureKey: 31, multiEndpoint: true},
@@ -140,25 +141,25 @@ export default [{
   ],
   toZigbee: [
     tz.on_off,                              // EP1
-    tzLocal['Movement Clear Cooldown'],
-    tzLocal['Occupancy Clear Cooldown'],
-    tzLocal['Movement Detection Sensitivity'],
-    tzLocal['Occupancy Detection Sensitivity'],
-    tzLocal['Movement Detection Range'],
-    tzLocal['Occupancy Detection Range'],
+    tzLocal['movement_clear_cooldown'],
+    tzLocal['occupancy_clear_cooldown'],
+    tzLocal['movement_detection_sensitivity'],
+    tzLocal['occupancy_detection_sensitivity'],
+    tzLocal['movement_detection_range'],
+    tzLocal['occupancy_detection_range'],
   ],
 
   exposes: [
     e.light(),
-    e.binary('Moving Target', ea.STATE, true, false),
-    e.binary('Static Target', ea.STATE, true, false),
+    e.binary('moving_target', ea.STATE, true, false).withDescription("Indicates whether the device detected movement"),
+    e.binary('static_target', ea.STATE, true, false).withDescription("Indicates whether the device detected peace"),
     e.occupancy(),
-    exposes.numeric('Movement Clear Cooldown', ea.ALL).withUnit('s').withValueMin(0).withValueMax(300),
-    exposes.numeric('Occupancy Clear Cooldown', ea.ALL).withUnit('s').withValueMin(0).withValueMax(65535),
-    exposes.numeric('Movement Detection Sensitivity', ea.ALL).withValueMin(0).withValueMax(10),
-    exposes.numeric('Occupancy Detection Sensitivity', ea.ALL).withValueMin(0).withValueMax(10),
-    exposes.numeric('Movement Detection Range', ea.ALL).withUnit('m').withValueMin(0.0).withValueMax(6.0).withValueStep(0.75),
-    exposes.numeric('Occupancy Detection Range', ea.ALL).withUnit('m').withValueMin(0.75).withValueMax(6.0).withValueStep(0.75),
+    exposes.numeric('movement_clear_cooldown', ea.ALL).withUnit('s').withCategory("config").withValueMin(0).withValueMax(300).withDescription("Movement clear time"),
+    exposes.numeric('occupancy_clear_cooldown', ea.ALL).withUnit('s').withCategory("config").withValueMin(0).withValueMax(65535).withDescription("Occupancy clear time"),
+    exposes.numeric('movement_detection_sensitivity', ea.ALL).withCategory("config").withValueMin(0).withValueMax(10).withDescription("Movement detection sensitivity"),
+    exposes.numeric('occupancy_detection_sensitivity', ea.ALL).withCategory("config").withValueMin(0).withValueMax(10).withDescription("Occupancy detection sensitivity"),
+    exposes.numeric('movement_detection_range', ea.ALL).withUnit('m').withCategory("config").withValueMin(0.0).withValueMax(6.0).withValueStep(0.75).withDescription("Movement detection range distance"),
+    exposes.numeric('occupancy_detection_range', ea.ALL).withUnit('m').withCategory("config").withValueMin(0.75).withValueMax(6.0).withValueStep(0.75).withDescription("Occupancy detection range distance"),
 
   ],
 

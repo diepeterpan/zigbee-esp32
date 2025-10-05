@@ -183,6 +183,31 @@ static void shs_ld2410_write_cmd(const uint8_t *payload, uint16_t payload_len)
 static inline uint16_t shs_clamp_u16(uint16_t v, uint16_t lo, uint16_t hi) { return v < lo ? lo : (v > hi ? hi : v); }
 static inline uint8_t  shs_clamp_u8 (uint8_t  v, uint8_t  lo, uint8_t  hi) { return v < lo ? lo : (v > hi ? hi : v); }
 
+static void shs_ld2410_disable_ble(void)
+{
+    vTaskDelay(pdMS_TO_TICKS(1000)); /* wait for module to be ready */
+    const uint8_t begin_cfg[] = { (SHS_LD2410_CMD_BEGIN_CONFIG & 0xFF), ((SHS_LD2410_CMD_BEGIN_CONFIG >> 8) & 0xFF), 0x01, 0x00 };
+    shs_ld2410_write_cmd(begin_cfg, sizeof(begin_cfg));
+
+    const uint8_t disable_ble[] = { (SHS_LD2410_CMD_BLE_ENABLE & 0xFF), ((SHS_LD2410_CMD_BLE_ENABLE >> 8) & 0xFF), 0x00, 0x00 };
+    shs_ld2410_write_cmd(disable_ble, sizeof(disable_ble));
+
+    const uint8_t end_cfg[] = { (SHS_LD2410_CMD_END_CONFIG & 0xFF), ((SHS_LD2410_CMD_END_CONFIG >> 8) & 0xFF) };
+    shs_ld2410_write_cmd(end_cfg, sizeof(end_cfg));
+    ESP_LOGI(SHS_TAG, "Bluetooth LE disabled on LD2410.");
+
+    vTaskDelay(pdMS_TO_TICKS(200)); /* wait a bit; the restart the module for the bluetooth disable to take effect */
+    shs_ld2410_write_cmd(begin_cfg, sizeof(begin_cfg));
+
+    const uint8_t restart_module[] = { (SHS_LD2410_CMD_RESTART_MODULE & 0xFF), ((SHS_LD2410_CMD_RESTART_MODULE >> 8) & 0xFF) };
+    shs_ld2410_write_cmd(restart_module, sizeof(restart_module));
+
+    shs_ld2410_write_cmd(end_cfg, sizeof(end_cfg));
+    
+    ESP_LOGI(SHS_TAG, "Module restart command sent to LD2410.");
+    vTaskDelay(pdMS_TO_TICKS(1000));; /* wait for module to be ready */
+}
+
 static void shs_ld2410_apply_params_all(void)
 {
     /* belt-and-suspenders clamp */
@@ -835,22 +860,9 @@ void app_main(void)
 
     /* Load settings & push to LD2410 */
     shs_cfg_load_from_nvs();
+    shs_ld2410_disable_ble();
     shs_ld2410_apply_global_sensitivity();
     shs_ld2410_apply_params_all();
-
-    /* BEGIN Disable BLE on LD2410 */
-    const uint8_t begin_cfg[] = { (SHS_LD2410_CMD_BEGIN_CONFIG & 0xFF), ((SHS_LD2410_CMD_BEGIN_CONFIG >> 8) & 0xFF), 0x01, 0x00 };
-    shs_ld2410_write_cmd(begin_cfg, sizeof(begin_cfg));
-
-    const uint8_t disable_ble[] = { (SHS_LD2410_CMD_BLE_ENABLE & 0xFF), ((SHS_LD2410_CMD_BLE_ENABLE >> 8) & 0xFF), 0x00, 0x00 };
-    shs_ld2410_write_cmd(disable_ble, sizeof(disable_ble));
-
-    const uint8_t end_cfg[] = { (SHS_LD2410_CMD_END_CONFIG & 0xFF), ((SHS_LD2410_CMD_END_CONFIG >> 8) & 0xFF) };
-    shs_ld2410_write_cmd(end_cfg, sizeof(end_cfg));
-
-    ESP_LOGI(SHS_TAG, "Bluetooth LE disabled on LD2410.");
-
-    /* END Disable BLE on LD2410 */
 
     /* Save worker (debounce + off-thread writes) */
     shs_save_q = xQueueCreate(8, sizeof(shs_save_msg_t));
