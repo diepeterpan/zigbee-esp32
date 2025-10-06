@@ -127,7 +127,7 @@ export default [{
   serverModuleFormat: 'cjs',
   fingerprint: [{modelID: 'SHS01', manufacturerName: 'SmartHomeScene'}],
   model: 'SHS01',
-  icon: 'http://zigbee2mqtt.ourhome.co.za:8180/device_icons/ld2410.jpg',
+  icon: 'http://zigbee2mqtt.ourhome.co.za:8180/device_icons/ld2410.png',
   vendor: 'SmartHomeScene',
   description: 'ESP32-C6 LD2410C: light + Moving/Static/Occupancy + config (EP1/EP2)',
   meta: {configureKey: 31, multiEndpoint: true},
